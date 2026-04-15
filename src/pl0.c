@@ -13,7 +13,7 @@
 
 /* ========== 常量定义 ========== */
 #define AL      10    /* 标识符最大长度 */
-#define NORW    14    /* 保留字个数 */
+#define NORW    18    /* 保留字个数 */
 #define TXMAX   100   /* 符号表容量 */
 #define NMAX    14    /* 数字最大位数 */
 #define AMAX    2047  /* 最大地址值 */
@@ -26,6 +26,7 @@ typedef enum {
     LSS, LEQ, GTR, GEQ, LPAREN, RPAREN, COMMA, SEMICOLON, PERIOD,
     BECOMES, BEGINSYM, ENDSYM, IFSYM, THENSYM, WHILESYM, WRITESYM,
     READSYM, DOSYM, CALLSYM, CONSTSYM, VARSYM, PROCSYM, PROGSYM,
+    FORSYM, TOSYM, DOWNTOSYM, RETURNSYM, ELSESYM, PE, ME, PP, MM,
     SYM_COUNT
 } SYMBOL;
 
@@ -207,6 +208,18 @@ void GetSym() {
         GetCh();
         if (CH == '=') { SYM = BECOMES; GetCh(); }
         else SYM = NUL;
+    }
+    else if (CH == '+') {
+        GetCh();
+        if (CH == '=') { SYM = PE; GetCh(); }
+        else if (CH == '+') { SYM = PP; GetCh(); }
+        else SYM = PLUS;
+    }
+    else if (CH == '-') {
+        GetCh();
+        if (CH == '=') { SYM = ME; GetCh(); }
+        else if (CH == '-') { SYM = MM; GetCh(); }
+        else SYM = MINUS;
     }
     else if (CH == '<') {
         GetCh();
@@ -600,6 +613,8 @@ int main(int argc, char *argv[]) {
     strcpy(KWORD[ 9], "PROGRAM");  strcpy(KWORD[10], "READ");
     strcpy(KWORD[11], "THEN");     strcpy(KWORD[12], "VAR");
     strcpy(KWORD[13], "WHILE");    strcpy(KWORD[14], "WRITE");
+    strcpy(KWORD[15], "FOR");     strcpy(KWORD[16], "TO");
+    strcpy(KWORD[17], "DOWNTO"); strcpy(KWORD[18], "RETURN");
     
     WSYM[ 1] = BEGINSYM;   WSYM[ 2] = CALLSYM;
     WSYM[ 3] = CONSTSYM;   WSYM[ 4] = DOSYM;
@@ -608,6 +623,8 @@ int main(int argc, char *argv[]) {
     WSYM[ 9] = PROGSYM;    WSYM[10] = READSYM;
     WSYM[11] = THENSYM;    WSYM[12] = VARSYM;
     WSYM[13] = WHILESYM;   WSYM[14] = WRITESYM;
+    WSYM[15] = FORSYM;     WSYM[16] = TOSYM;
+    WSYM[17] = DOWNTOSYM;  WSYM[18] = RETURNSYM;
     
     SSYM['+'] = PLUS;      SSYM['-'] = MINUS;
     SSYM['*'] = TIMES;     SSYM['/'] = SLASH;
@@ -634,7 +651,7 @@ int main(int argc, char *argv[]) {
     STATBEGSYS[CALLSYM] = 1;
     STATBEGSYS[IFSYM] = 1;
     STATBEGSYS[WHILESYM] = 1;
-    STATBEGSYS[WRITESYM] = 1;
+    STATBEGSYS[WRITESYM] = 1; STATBEGSYS[FORSYM] = 1; STATBEGSYS[RETURNSYM] = 1;
     FACBEGSYS[IDENT] = 1;
     FACBEGSYS[NUMBER] = 1;
     FACBEGSYS[LPAREN] = 1;
