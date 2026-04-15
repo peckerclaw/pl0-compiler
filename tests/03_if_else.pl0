@@ -1,0 +1,10 @@
+/* 测试 IF-ELSE 语句 */
+PROGRAM test_ifelse;
+VAR x;
+BEGIN
+    x := 10;
+    IF x > 5 THEN
+        WRITE(1)
+    ELSE
+        WRITE(0)
+END.

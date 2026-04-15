@@ -1,0 +1,25 @@
+=== COMPILE tests/03_if_else.pl0 ===
+  0 /* 测试 IF-ELSE 语句 */ 
+*** !  0
+*** !  7
+***                 !  11
+***                           !  24
+  3 PROGRAM test_ifelse; 
+***       !  24
+***            !  11
+***             !  23
+***                   !  11
+***                    !  20
+***                    !  16
+***                    !  8
+  7 VAR x; 
+  0 JMP 0 1
+  1 INT 0 3
+  2 OPR 0 4
+  3 OPR 0 5
+  4 OPR 0 1
+  5 JPC 0 6
+  6 OPR 0 0
+***   !  9
+
+ERROR IN PL/0 PROGRAM (12 errors)

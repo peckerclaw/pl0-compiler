@@ -1,0 +1,8 @@
+/* 测试不等号 <> */
+PROGRAM test_relop;
+VAR a, b;
+BEGIN
+    a := 5;
+    b := 3;
+    IF a <> b THEN WRITE(1) ELSE WRITE(0)
+END.

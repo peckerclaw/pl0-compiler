@@ -1,0 +1,9 @@
+/* 测试 FOR DOWNTO 语句（步长=-2） */
+PROGRAM test_for_downto;
+VAR i, s;
+BEGIN
+    s := 0;
+    FOR i := 8 DOWNTO 2 DO
+        s := s + i;
+    WRITE(s)  /* 8+6+4+2 = 20 */
+END.

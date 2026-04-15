@@ -1,0 +1,33 @@
+=== COMPILE tests/01_basic.pl0 ===
+  0 /* PL/0 基础功能测试 - 原始功能验证 */ 
+  0 PROGRAM test1; 
+  0 VAR x, y; 
+  1 BEGIN 
+  2     x := 5; 
+  4     y := 3; 
+  6     WRITE(x + y); 
+***         !  11
+***          !  19
+  6     WRITE(x - y); 
+***         !  11
+***          !  19
+  6     WRITE(x * y); 
+***         !  11
+***          !  19
+  6     IF x > y THEN WRITE(1) ELSE WRITE(0) 
+***                       !  11
+***                        !  19
+ 10 END. 
+  0 JMP 0 1
+  1 INT 0 5
+  2 LIT 0 5
+  3 STO 0 3
+  4 LIT 0 3
+  5 STO 0 4
+  6 LOD 0 3
+  7 LOD 0 4
+  8 OPR 0 12
+  9 JPC 0 10
+ 10 OPR 0 0
+
+ERROR IN PL/0 PROGRAM (8 errors)

@@ -1,0 +1,10 @@
+/* 测试复合赋值 += 和 -= */
+PROGRAM test_compound;
+VAR x;
+BEGIN
+    x := 10;
+    x += 5;   /* x = 15 */
+    WRITE(x);
+    x -= 3;   /* x = 12 */
+    WRITE(x)
+END.

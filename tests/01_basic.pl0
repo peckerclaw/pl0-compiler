@@ -1,0 +1,11 @@
+/* PL/0 基础功能测试 - 原始功能验证 */
+PROGRAM test1;
+VAR x, y;
+BEGIN
+    x := 5;
+    y := 3;
+    WRITE(x + y);
+    WRITE(x - y);
+    WRITE(x * y);
+    IF x > y THEN WRITE(1) ELSE WRITE(0)
+END.

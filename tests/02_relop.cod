@@ -1,0 +1,14 @@
+=== COMPILE tests/02_relop.pl0 ===
+  0 /* 测试不等号 <> */ 
+*** !  0
+*** !  7
+  1 PROGRAM test_relop; 
+***            !  11
+***             !  19
+***             !  8
+  0 JMP 0 1
+  1 INT 0 3
+  2 OPR 0 0
+***             !  9
+
+ERROR IN PL/0 PROGRAM (6 errors)
