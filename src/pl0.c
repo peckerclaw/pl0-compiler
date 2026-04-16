@@ -13,7 +13,7 @@
 
 /* ========== 常量定义 ========== */
 #define AL      10    /* 标识符最大长度 */
-#define NORW    14    /* 保留字个数 */
+#define NORW    18    /* 保留字个数: 14原版 + FOR/TO/DOWNTO/RETURN */
 #define TXMAX   100   /* 符号表容量 */
 #define NMAX    14    /* 数字最大位数 */
 #define AMAX    2047  /* 最大地址值 */
@@ -26,6 +26,8 @@ typedef enum {
     LSS, LEQ, GTR, GEQ, LPAREN, RPAREN, COMMA, SEMICOLON, PERIOD,
     BECOMES, BEGINSYM, ENDSYM, IFSYM, THENSYM, WHILESYM, WRITESYM,
     READSYM, DOSYM, CALLSYM, CONSTSYM, VARSYM, PROCSYM, PROGSYM,
+    FORSYM, TOSYM, DOWNTOSYM, RETURNSYM, ELSESYM,
+    PE, ME, PP, MM,  /* 复合赋值: += -= 自增自减: ++ -- */
     SYM_COUNT
 } SYMBOL;
 
@@ -202,6 +204,18 @@ void GetSym() {
             K++; GetCh();
         } while (isdigit(CH));
         if (K > NMAX) Error(30);
+    }
+    else if (CH == '+') {
+        GetCh();
+        if (CH == '=') { SYM = PE; GetCh(); }
+        else if (CH == '+') { SYM = PP; GetCh(); }
+        else SYM = PLUS;
+    }
+    else if (CH == '-') {
+        GetCh();
+        if (CH == '=') { SYM = ME; GetCh(); }
+        else if (CH == '-') { SYM = MM; GetCh(); }
+        else SYM = MINUS;
     }
     else if (CH == ':') {
         GetCh();
@@ -593,21 +607,27 @@ int main(int argc, char *argv[]) {
     
     for (i = 0; i < 256; i++) SSYM[i] = NUL;
     
+    /* 保留字表 (按字母顺序排列以便二分查找) */
     strcpy(KWORD[ 1], "BEGIN");    strcpy(KWORD[ 2], "CALL");
     strcpy(KWORD[ 3], "CONST");    strcpy(KWORD[ 4], "DO");
-    strcpy(KWORD[ 5], "END");      strcpy(KWORD[ 6], "IF");
-    strcpy(KWORD[ 7], "ODD");      strcpy(KWORD[ 8], "PROCEDURE");
-    strcpy(KWORD[ 9], "PROGRAM");  strcpy(KWORD[10], "READ");
-    strcpy(KWORD[11], "THEN");     strcpy(KWORD[12], "VAR");
-    strcpy(KWORD[13], "WHILE");    strcpy(KWORD[14], "WRITE");
+    strcpy(KWORD[ 5], "DOWNTO");   strcpy(KWORD[ 6], "END");
+    strcpy(KWORD[ 7], "FOR");      strcpy(KWORD[ 8], "IF");
+    strcpy(KWORD[ 9], "ODD");      strcpy(KWORD[10], "PROCEDURE");
+    strcpy(KWORD[11], "PROGRAM");  strcpy(KWORD[12], "READ");
+    strcpy(KWORD[13], "RETURN");   strcpy(KWORD[14], "THEN");
+    strcpy(KWORD[15], "TO");       strcpy(KWORD[16], "VAR");
+    strcpy(KWORD[17], "WHILE");    strcpy(KWORD[18], "WRITE");
     
+    /* 保留字符号 (与KWORD顺序对应) */
     WSYM[ 1] = BEGINSYM;   WSYM[ 2] = CALLSYM;
     WSYM[ 3] = CONSTSYM;   WSYM[ 4] = DOSYM;
-    WSYM[ 5] = ENDSYM;     WSYM[ 6] = IFSYM;
-    WSYM[ 7] = ODDSYM;     WSYM[ 8] = PROCSYM;
-    WSYM[ 9] = PROGSYM;    WSYM[10] = READSYM;
-    WSYM[11] = THENSYM;    WSYM[12] = VARSYM;
-    WSYM[13] = WHILESYM;   WSYM[14] = WRITESYM;
+    WSYM[ 5] = DOWNTOSYM;  WSYM[ 6] = ENDSYM;
+    WSYM[ 7] = FORSYM;     WSYM[ 8] = IFSYM;
+    WSYM[ 9] = ODDSYM;     WSYM[10] = PROCSYM;
+    WSYM[11] = PROGSYM;    WSYM[12] = READSYM;
+    WSYM[13] = RETURNSYM;  WSYM[14] = THENSYM;
+    WSYM[15] = TOSYM;      WSYM[16] = VARSYM;
+    WSYM[17] = WHILESYM;   WSYM[18] = WRITESYM;
     
     SSYM['+'] = PLUS;      SSYM['-'] = MINUS;
     SSYM['*'] = TIMES;     SSYM['/'] = SLASH;

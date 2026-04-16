@@ -1,0 +1,8 @@
+/* 测试: 不等号 <> (替换 #) */
+PROGRAM test_neq;
+VAR a, b;
+BEGIN
+    a := 5;
+    b := 3;
+    IF a <> b THEN WRITE(1);
+END.
