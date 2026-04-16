@@ -13,7 +13,7 @@
 
 /* ========== 常量定义 ========== */
 #define AL      10    /* 标识符最大长度 */
-#define NORW    18    /* 保留字个数: 14原版 + FOR/TO/DOWNTO/RETURN */
+#define NORW    19    /* 保留字个数: 14原版 + FOR/TO/DOWNTO/RETURN + ELSE */
 #define TXMAX   100   /* 符号表容量 */
 #define NMAX    14    /* 数字最大位数 */
 #define AMAX    2047  /* 最大地址值 */
@@ -450,15 +450,29 @@ void statement(int *FSYS, int LEV, int *TX) {
                 GetSym();
             }
             break;
-        case IFSYM:
+        case IFSYM: {
+            int *nxtlev;
             GetSym();
-            condition(SymSetUnion(SymSetNew2(THENSYM, DOSYM), FSYS), LEV, TX);
+            /* IF-ELSE: 条件判断后可能跟 THEN 或 ELSE */
+            nxtlev = SymSetUnion(SymSetNew3(THENSYM, ELSESYM, DOSYM), FSYS);
+            condition(nxtlev, LEV, TX);
             if (SYM == THENSYM) GetSym();
             else Error(16);
-            CX1 = CX; GEN(JPC, 0, 0);
-            statement(FSYS, LEV, TX);
-            CODE[CX1].A = CX;
+            CX1 = CX; GEN(JPC, 0, 0);  /* 条件假时跳转到ELSE或跳过IF块 */
+            /* THEN 语句: follow set 必须包含 ELSESYM */
+            nxtlev = SymSetAdd(ELSESYM, FSYS);
+            statement(nxtlev, LEV, TX);
+            if (SYM == ELSESYM) {
+                CX2 = CX; GEN(JMP, 0, 0);  /* 跳过ELSE块 */
+                CODE[CX1].A = CX;  /* JPC跳转到ELSE */
+                GetSym();
+                statement(FSYS, LEV, TX);  /* ELSE 语句 */
+                CODE[CX2].A = CX;  /* JMP跳转到IF结束后 */
+            } else {
+                CODE[CX1].A = CX;  /* 无ELSE时，JPC跳转到IF结束后 */
+            }
             break;
+        }
         case BEGINSYM:
             GetSym();
             statement(SymSetUnion(SymSetNew2(SEMICOLON, ENDSYM), FSYS), LEV, TX);
@@ -610,24 +624,26 @@ int main(int argc, char *argv[]) {
     /* 保留字表 (按字母顺序排列以便二分查找) */
     strcpy(KWORD[ 1], "BEGIN");    strcpy(KWORD[ 2], "CALL");
     strcpy(KWORD[ 3], "CONST");    strcpy(KWORD[ 4], "DO");
-    strcpy(KWORD[ 5], "DOWNTO");   strcpy(KWORD[ 6], "END");
-    strcpy(KWORD[ 7], "FOR");      strcpy(KWORD[ 8], "IF");
-    strcpy(KWORD[ 9], "ODD");      strcpy(KWORD[10], "PROCEDURE");
-    strcpy(KWORD[11], "PROGRAM");  strcpy(KWORD[12], "READ");
-    strcpy(KWORD[13], "RETURN");   strcpy(KWORD[14], "THEN");
-    strcpy(KWORD[15], "TO");       strcpy(KWORD[16], "VAR");
-    strcpy(KWORD[17], "WHILE");    strcpy(KWORD[18], "WRITE");
+    strcpy(KWORD[ 5], "DOWNTO");   strcpy(KWORD[ 6], "ELSE");
+    strcpy(KWORD[ 7], "END");      strcpy(KWORD[ 8], "FOR");
+    strcpy(KWORD[ 9], "IF");       strcpy(KWORD[10], "ODD");
+    strcpy(KWORD[11], "PROCEDURE");strcpy(KWORD[12], "PROGRAM");
+    strcpy(KWORD[13], "READ");     strcpy(KWORD[14], "RETURN");
+    strcpy(KWORD[15], "THEN");     strcpy(KWORD[16], "TO");
+    strcpy(KWORD[17], "VAR");      strcpy(KWORD[18], "WHILE");
+    strcpy(KWORD[19], "WRITE");
     
     /* 保留字符号 (与KWORD顺序对应) */
     WSYM[ 1] = BEGINSYM;   WSYM[ 2] = CALLSYM;
     WSYM[ 3] = CONSTSYM;   WSYM[ 4] = DOSYM;
-    WSYM[ 5] = DOWNTOSYM;  WSYM[ 6] = ENDSYM;
-    WSYM[ 7] = FORSYM;     WSYM[ 8] = IFSYM;
-    WSYM[ 9] = ODDSYM;     WSYM[10] = PROCSYM;
-    WSYM[11] = PROGSYM;    WSYM[12] = READSYM;
-    WSYM[13] = RETURNSYM;  WSYM[14] = THENSYM;
-    WSYM[15] = TOSYM;      WSYM[16] = VARSYM;
-    WSYM[17] = WHILESYM;   WSYM[18] = WRITESYM;
+    WSYM[ 5] = DOWNTOSYM;  WSYM[ 6] = ELSESYM;
+    WSYM[ 7] = ENDSYM;     WSYM[ 8] = FORSYM;
+    WSYM[ 9] = IFSYM;       WSYM[10] = ODDSYM;
+    WSYM[11] = PROCSYM;    WSYM[12] = PROGSYM;
+    WSYM[13] = READSYM;    WSYM[14] = RETURNSYM;
+    WSYM[15] = THENSYM;    WSYM[16] = TOSYM;
+    WSYM[17] = VARSYM;     WSYM[18] = WHILESYM;
+    WSYM[19] = WRITESYM;
     
     SSYM['+'] = PLUS;      SSYM['-'] = MINUS;
     SSYM['*'] = TIMES;     SSYM['/'] = SLASH;
